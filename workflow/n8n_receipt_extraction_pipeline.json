@@ -1,0 +1,789 @@
+{
+  "name": "End-to-End Receipt & Invoice Data Extraction Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "59ffddb3-2df3-4218-93cc-a728db488a01",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        16,
+        496
+      ],
+      "webhookId": "c6a9a358-6607-4e0e-8bb9-3d065f1716aa",
+      "credentials": {
+        "telegramApi": {
+          "id": "XWPyzuE0ntb6uIC3",
+          "name": "Telegram P1"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "d0804f86-3431-45fd-9c3f-16635199d998",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        1952,
+        448
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "K18Xcrr9bIJHcQR2",
+          "name": "OpenAi account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.cloud.llamaindex.ai/api/parsing/job/{{ $node[\"Check Parsing Job Status\"].json[\"id\"] }}/result/markdown",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer llx-rhTbCNhePSa0nIBbp4CHK3Dkj5PbPha1kD0YUowHOW7VuP19"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        832,
+        384
+      ],
+      "id": "8ec15130-fd1d-407a-9a82-1bdb7e6ac8ea",
+      "name": "HTTP Get Data"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "builtInTools": {},
+        "options": {
+          "temperature": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1072,
+        608
+      ],
+      "id": "83b91593-ac6b-47d9-8356-f7b74113953d",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "QffJu9tFpyx3Lpgf",
+          "name": "PROYECT 1"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cloud.llamaindex.ai/api/parsing/upload",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer llx-rhTbCNhePSa0nIBbp4CHK3Dkj5PbPha1kD0YUowHOW7VuP19"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer llx-rhTbCNhePSa0nIBbp4CHK3Dkj5PbPha1kD0YUowHOW7VuP19"
+            },
+            {
+              "name": "parse_mode",
+              "value": "parse_page_with_llm"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "language",
+              "value": "es"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "parsing_instruction",
+              "value": "Extrae la fecha, el lugar, el método de pago y la tabla de productos con cantidad, precio y descuentos."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        320,
+        496
+      ],
+      "id": "d8b3acdf-65b8-4b60-b6ba-346d6e2f9864",
+      "name": "Image to LlamaIndex Parsing API"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "SUCCESS",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "3304ed77-9f37-4717-ad05-dc8e952f1eee"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b47f30d5-e711-481e-b6e0-2f8138efff81",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "PENDING",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        672,
+        496
+      ],
+      "id": "fc7464a5-e54f-44a1-851c-3f669ec3a414",
+      "name": "Check Parsing Job Status"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        832,
+        608
+      ],
+      "id": "271b492c-e2a7-4f7f-8850-deff8aae222c",
+      "name": "Wait for Parsing Completion",
+      "webhookId": "b84e59b5-e78b-45ee-a3a9-e7716e136680"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1tX7Okmk0ze42IQofWlH_ROO9QapKxqEzL_SMVAg9jT8",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1430npKcShV_2cN6WDLng6_-HsmrIP2YMYqDm5QJL6eI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "fecha": "={{ $json.Fecha }}",
+            "lugar": "={{ $json.Lugar}} }}",
+            "metodo_de_pago": "={{ $json.MetodoDePago }}",
+            "producto": "={{ $json.Producto }}",
+            "cantidad": "={{ $json.Cantidad }}",
+            "precio_unitario": "={{ $json.PrecioUnitario }}",
+            "descuento": "={{ $json.Descuento }}",
+            "subtotal": "={{ $json.Subtotal }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "fecha",
+              "displayName": "fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "lugar",
+              "displayName": "lugar",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "metodo_de_pago",
+              "displayName": "metodo_de_pago",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "producto",
+              "displayName": "producto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "cantidad",
+              "displayName": "cantidad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "precio_unitario",
+              "displayName": "precio_unitario",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "descuento",
+              "displayName": "descuento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "subtotal",
+              "displayName": "subtotal",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "useAppend": true
+        }
+      },
+      "id": "78e5a197-0649-4d0f-a7e9-5dcebd3a5491",
+      "name": "Append Records to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1792,
+        592
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "SoDLY1BgnsGJFBNS",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "65466faa-7803-4856-84b3-bd71c42107ff",
+              "name": "Producto",
+              "value": "={{$json.Items.Producto}}\n",
+              "type": "string"
+            },
+            {
+              "id": "529e4b0c-0449-43b6-916b-45d904f11b9b",
+              "name": "Cantidad",
+              "value": "={{$json.Items.Cantidad}}",
+              "type": "number"
+            },
+            {
+              "id": "3866a4b7-ec0d-4e3f-9981-2feb45e73e32",
+              "name": "PrecioUnitario",
+              "value": "={{$json.Items.PrecioUnitario}}",
+              "type": "number"
+            },
+            {
+              "id": "144747e6-45b9-41cc-bba0-951d5cda11f1",
+              "name": "Descuento",
+              "value": "={{$json.Items.Descuento}}\n",
+              "type": "number"
+            },
+            {
+              "id": "5b0407a2-d1e6-44cd-98fa-0c1c18b7026e",
+              "name": "Subtotal",
+              "value": "={{$json.Items.Subtotal}}\n",
+              "type": "number"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1584,
+        384
+      ],
+      "id": "68891241-92d3-4486-8620-def9cd2eb492",
+      "name": "Normalize Line Item Fields"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "Items",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        384
+      ],
+      "id": "b5eb79d7-6ea9-48c9-a997-2d1a09490c3d",
+      "name": "Split Line Items"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5a3762f3-e9a3-43bb-9146-ea3be70143b8",
+              "name": "Fecha",
+              "value": "={{ $json.output.Fecha }}",
+              "type": "string"
+            },
+            {
+              "id": "1668d7f1-9e69-4925-b586-262bf39cd8ac",
+              "name": "Lugar",
+              "value": "={{ $json.output.Lugar }}",
+              "type": "string"
+            },
+            {
+              "id": "82ecf020-dca8-4efd-80d4-e4aa7a6560ea",
+              "name": "MetodoDePago",
+              "value": "={{ $json.output.MetodoDePago }}",
+              "type": "string"
+            },
+            {
+              "id": "37121f5c-7b94-43b1-b538-3326051bfef3",
+              "name": "Items",
+              "value": "={{ $json.output.Items }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1264,
+        384
+      ],
+      "id": "21dd6d3c-5077-4812-8701-ac6476fabba2",
+      "name": "Normalize Invoice Fields"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.markdown }}",
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"required\": [\"Fecha\", \"Lugar\", \"Items\"],\n  \"properties\": {\n    \"Fecha\": {\n      \"type\": \"string\",\n      \"description\": \"Fecha en formato DD-MM-YYYY\"\n    },\n    \"Lugar\": {\n      \"type\": \"string\",\n      \"description\": \"Nombre comercial (Ej: La Anonima, Tante Sara)\"\n    },\n    \"MetodoDePago\": {\n      \"type\": [\"string\", \"null\"],\n      \"description\": \"Metodo de pago (Efectivo, Mercado Pago, Debito)\"\n    },\n    \"Items\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"required\": [\"Producto\", \"Cantidad\", \"PrecioUnitario\", \"Subtotal\"],\n        \"properties\": {\n          \"Producto\": {\n            \"type\": \"string\",\n            \"description\": \"Nombre del articulo\"\n          },\n          \"Cantidad\": {\n            \"type\": \"number\"\n          },\n          \"PrecioUnitario\": {\n            \"type\": \"number\"\n          },\n          \"Descuento\": {\n            \"type\": [\"number\", \"null\"],\n            \"description\": \"Valor de 'Oferta' o 'Beneficio' asociado al producto\"\n          },\n          \"Subtotal\": {\n            \"type\": \"number\",\n            \"description\": \"Importe total de la linea (el valor mas a la derecha)\"\n          }\n        }\n      }\n    }\n  }\n}",
+        "options": {
+          "systemPromptTemplate": "Eres un extractor estructurado de datos de tickets y facturas argentinas.\n\nTu objetivo es extraer datos EXACTOS del ticket sin inventar ni normalizar marcas incorrectamente.\n\n-----------------------------\nREGLAS DE IDENTIFICACIÓN\n-----------------------------\n\n1. LUGAR:\n- Extrae el nombre comercial EXACTO que figure en el encabezado del ticket.\n- Prioriza el primer nombre visible en la parte superior.\n- NO reemplaces ni normalices por marcas conocidas.\n- Ejemplo:\n   \"ATLANTICO SUR\" → ATLANTICO SUR\n   \"S.A. Importadora y Exportadora de la Patagonia\" → La Anonima (solo este caso especial permitido)\n\n---\n\n2. PRODUCTO:\n- Prioriza siempre la DESCRIPCIÓN del artículo.\n- Ignora códigos internos, SKU o PLU si existe una descripción textual.\n- Si una línea contiene código + descripción → usa SOLO la descripción.\n- Solo usa el código si NO existe descripción.\n\n---\n\n3. METODO DE PAGO:\nBusca el medio de pago en secciones como:\n\"RECIBIMOS\"\n\"FORMA DE PAGO\"\n\"PAGO\"\n\"TARJETA\"\n\"MP\"\n\"TRANSFERENCIA\"\n\nNormaliza a uno de estos valores:\n\n• efectivo   \n• nfc  \n• qr  \n• transferencia  \n \n\n\nReglas de inferencia:\n\n- Si aparece \"Mastercard\", \"Visa\", \"Amex\", \"Manual\" junto a una tarjeta, \"Contactless\", \"Tap\", \"NFC\":\n   → devolver \"NFC\"\n\n- Si aparece \"Mercado Pago\" o \"MP\":\n   → devolver \"QR\"\n\n\n---\n\n4. DESCUENTOS:\n- Busca líneas debajo del producto que indiquen descuento.\n- Extrae el valor numérico del descuento asociado a ese producto.\n- Si el descuento es general, dejar null.\n\n---\n\n5. SUBTOTAL:\n- Es el importe final de cada línea de producto.\n- NO realizar cálculos.\n\n---\n\n-----------------------------\nREGLAS ESTRICTAS\n-----------------------------\n\n- NO inventar datos\n- NO adivinar marcas\n- NO completar campos si no aparecen\n- Ignorar:\n  • CAE\n  • Régimen fiscal\n  • Vuelto\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1,
+      "position": [
+        992,
+        384
+      ],
+      "id": "c7baf601-fa17-484f-aa8c-b71b2d0a967c",
+      "name": "Extract Structured Invoice Data (LLM Extractor)"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "3b598e77-d62d-4133-81eb-844d7ef2dbe8",
+      "name": "Send Telegram Response",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2208,
+        240
+      ],
+      "webhookId": "799f6195-8885-4102-9ebf-a3c41838040d",
+      "credentials": {
+        "telegramApi": {
+          "id": "XWPyzuE0ntb6uIC3",
+          "name": "Telegram P1"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Toda la información de la factura o ticket: {{ $('HTTP Get Data').item.json.markdown }}",
+        "options": {
+          "systemMessage": "Eres un asistente que resume información ya extraída de tickets y facturas.\n\nIMPORTANTE:\nNo debes reinterpretar el ticket ni inventar datos.\nSolo debes usar la información estructurada que recibes.\n\n---------------------------------\nINSTRUCCIONES\n---------------------------------\n\nGenera un resumen claro y breve para el usuario con:\n\n• Fecha\n• Lugar\n• Método de pago\n• Lista de productos\n• Total general (si está disponible en los datos)\n\nSi algún dato no está presente, simplemente omítelo.\n\n---------------------------------\nFORMATO OBLIGATORIO\n---------------------------------\n\n🧾 Comprobante registrado\n\n📅 Fecha: {Fecha}\n🏪 Comercio: {Lugar}\n💳 Medio de pago: {MetodoDePago}\n\n🛍 Productos:\n- {Producto} — {Cantidad} x ${PrecioUnitario} → ${Subtotal}\n(repetir por cada producto)\n\n💰 Total: ${Total}\n\n✅ Información guardada correctamente.\n\n---------------------------------\nREGLAS\n---------------------------------\n\n- No agregues explicaciones.\n- No inventes información faltante.\n- No cambies nombres de productos.\n- Mantén el mensaje corto y legible para Telegram.\n"
+        }
+      },
+      "id": "f28b78d3-d922-4363-b754-798dcd41b897",
+      "name": "Generate User Summary",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        1936,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{$json.message.photo[2].file_id }}{{ $json.message.document.file_id }}",
+        "additionalFields": {}
+      },
+      "id": "405e38b9-806c-451f-a196-adc0b6ea2f73",
+      "name": "Download File",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        160,
+        496
+      ],
+      "webhookId": "e52abcb4-6cb9-42e6-8eba-a89756196408",
+      "credentials": {
+        "telegramApi": {
+          "id": "XWPyzuE0ntb6uIC3",
+          "name": "Telegram P1"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1792,
+        240
+      ],
+      "id": "36f75af4-7b64-434a-905b-bc3147492888",
+      "name": "Aggregate1"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.cloud.llamaindex.ai/api/parsing/job/{{ $node[\"Image to LlamaIndex Parsing API\"].json[\"id\"] }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        528,
+        496
+      ],
+      "id": "56bf72e7-3db3-4320-aa31-aa5525a69bf2",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Qc2xIHK9Pnn2kYzn",
+          "name": "Header Auth account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Download File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate User Summary",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Get Data": {
+      "main": [
+        [
+          {
+            "node": "Extract Structured Invoice Data (LLM Extractor)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Extract Structured Invoice Data (LLM Extractor)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image to LlamaIndex Parsing API": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Parsing Job Status": {
+      "main": [
+        [
+          {
+            "node": "HTTP Get Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait for Parsing Completion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for Parsing Completion": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append Records to Google Sheets": {
+      "main": [
+        []
+      ]
+    },
+    "Normalize Line Item Fields": {
+      "main": [
+        [
+          {
+            "node": "Append Records to Google Sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Line Items": {
+      "main": [
+        [
+          {
+            "node": "Normalize Line Item Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Invoice Fields": {
+      "main": [
+        [
+          {
+            "node": "Split Line Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Structured Invoice Data (LLM Extractor)": {
+      "main": [
+        [
+          {
+            "node": "Normalize Invoice Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate User Summary": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download File": {
+      "main": [
+        [
+          {
+            "node": "Image to LlamaIndex Parsing API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "Generate User Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Check Parsing Job Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "7bf9c55a-fdaf-4148-bdc9-e69d026f45da",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "533fabbff1c9d1ed72bb93bbc8109f0af1a4119a71f9e5861125740bb8780c44"
+  },
+  "id": "406o1I6570Ta-Aew-66jf",
+  "tags": []
+}
