@@ -1,14 +1,52 @@
-Automated Receipt Analytics Pipeline
-🌐 Table of Contents
+# Automated Receipt Analytics Pipeline
 
-🇺🇸 English Version
+> Transforming unstructured receipts into structured, analytics-ready data using AI and data engineering principles.
 
-🇪🇸 Versión en Español
+---
 
-👤 Author
+## 🚀 Key Highlights
 
-🇺🇸 English Version
-📌 Project Overview
+- 📄 Automated extraction from real-world receipts (Telegram ingestion)
+- 🧠 LLM-powered structured data interpretation (not just OCR)
+- 📊 Line-item level granularity for real analytics
+- ⚙️ End-to-end pipeline (ingestion → processing → BI dashboard)
+- 📈 Designed for decision-making, not just data collection
+
+---
+
+## 🧰 Tech Stack
+
+**Automation:** n8n, Telegram Bot API  
+**AI Processing:** OpenAI, LlamaIndex  
+**Data Modeling:** JSON Schema Validation  
+**Storage:** Google Sheets  
+**Visualization:** Power BI  
+
+---
+
+## 📊 Dashboard Preview
+
+![Dashboard Preview](./images/dashboard_preview.jpg)
+
+---
+
+## 🖼 Full Workflow
+
+![Workflow Overview](./images/workflow_overview.jpg)
+
+---
+
+# Automated Receipt Analytics Pipeline
+## 🌐 Table of Contents
+
+### 🇺🇸 English Version
+
+### 🇪🇸 Versión en Español
+
+### 👤 Author
+
+## 🇺🇸 English Version
+# 📌 Project Overview
 
 Most expense tracking systems fail not because of lack of tools, but because the data itself is messy, inconsistent, and expensive to process.
 
@@ -217,7 +255,7 @@ AI-based expense categorization
 
 Real-time analytics
 
-🇪🇸 Versión en Español
+## 🇪🇸 Versión en Español
 📌 Descripción del Proyecto
 
 La mayoría de los sistemas de control de gastos fallan no por falta de herramientas, sino porque los datos son inconsistentes, desordenados y difíciles de procesar.
