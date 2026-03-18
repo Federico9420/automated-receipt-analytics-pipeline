@@ -22,11 +22,10 @@
 **Storage:** Google Sheets  
 **Visualization:** Power BI  
 
----
 
-## 📊 Dashboard Preview
+## 📄 Telegram Demo
 
-![Dashboard Preview](./images/dashboard_preview.jpg)
+![Telegram Demo](./images/telegram_demo.jpg)
 
 ---
 
@@ -36,6 +35,17 @@
 
 ---
 
+## 📊 Dashboard Preview
+
+![Dashboard Preview](./images/dashboard_preview.jpg)
+
+---
+
+## 📊 Tooltip Preview
+
+![Dashboard Tooltip Preview](./images/dashboard_tooltip_preview.jpg)
+
+---
 # Automated Receipt Analytics Pipeline
 ## 🌐 Table of Contents
 
