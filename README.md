@@ -24,26 +24,22 @@
 
 
 ## 📄 Telegram Demo
-
-![Telegram Demo](./images/telegram_demo.jpg)
+![Telegram Demo](./screenshots/telegram_demo.jpg)
 
 ---
 
 ## 🖼 Full Workflow
-
-![Workflow Overview](./images/workflow_overview.jpg)
+![Workflow Overview](./screenshots/workflow_overview.jpg)
 
 ---
 
 ## 📊 Dashboard Preview
-
-![Dashboard Preview](./images/dashboard_preview.jpg)
+![Dashboard Preview](./screenshots/sales_dashboard_overview.jpeg)
 
 ---
 
 ## 📊 Tooltip Preview
-
-![Dashboard Tooltip Preview](./images/dashboard_tooltip_preview.jpg)
+![Dashboard Tooltip Preview](./screenshots/tooltip.png)
 
 ---
 # Automated Receipt Analytics Pipeline
